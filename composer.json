@@ -1,0 +1,5 @@
+{
+    "require": {
+        "walle89/swedbank-json": "^0.7.1"
+    }
+}
