@@ -2,25 +2,26 @@
 require 'vendor/autoload.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
-
 $path = parse_url($_SERVER['REQUEST_URI'])['path'];
 $action = explode('/', $path)[1];
 
-$function = strtolower($method) . ucfirst($action);
-(new Api())->$function($_REQUEST);
+$methodCall = strtolower($method) . ucfirst($action);
+(new Api())->$methodCall($_REQUEST);
 
 class Api {
+  const AUTH_TIMEOUT = 30;
+
   private function authUsingBankID($bankApp, $username) {
     session_start();
 
     $auth = new SwedbankJson\Auth\MobileBankID($bankApp, $username);
     $auth->initAuth();
     $tries = 0;
-    while(!$auth->verify() && ++$tries<30) {
-      sleep(1);
+    while(!$auth->verify() && ++$tries<self::AUTH_TIMEOUT) {
+      sleep(1); // waiting one second
     }
 
-    if ($tries<30) {
+    if ($tries<self::AUTH_TIMEOUT) {
       return $auth;
     }
 
